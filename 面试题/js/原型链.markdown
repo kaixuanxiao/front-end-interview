@@ -1,0 +1,87 @@
+## 原型链
+
+* 什么是原型
+
+* js中的原型链的体现
+
+* 应用场景：实现继承
+
+### 什么是原型
+
+原型: 每个函数都有一个 prototype（原型）属性，这个属性是一个指针，指向一个对象。如果使用这个函数生成了实例，那么称这个对象为所有实例的原型。
+
+原型链：实例对象属性的查找，从实例对象自身属性开始查找，其次从原型对象上查找，原型对象上又可能还有原型对象，依次类推，直到找到为止，形成一个原型链。
+
+### js中的原型链
+
+举例子：数组之所有有push方法和toString方法，分别是Array构造函数和Object构造函数上的原生方法
+
+### 应用场景：修改原型对象重写方法（vue2） | 实现继承
+
+* 重写原型方法
+
+```js
+// vue2 源码
+const arrayProto = Array.prototype
+export const arrayMethods = Object.create(arrayProto)
+
+const methodsToPatch = [
+  'push',
+  'pop',
+  'shift',
+  'unshift',
+  'splice',
+  'sort',
+  'reverse'
+]
+
+/**
+ * Intercept mutating methods and emit events
+ */
+methodsToPatch.forEach(function (method) {
+  // cache original method
+  const original = arrayProto[method]
+  def(arrayMethods, method, function mutator (...args) {
+    const result = original.apply(this, args)
+    const ob = this.__ob__
+    let inserted
+    switch (method) {
+      case 'push':
+      case 'unshift':
+        inserted = args
+        break
+      case 'splice':
+        inserted = args.slice(2)
+        break
+    }
+    if (inserted) ob.observeArray(inserted)
+    // notify change
+    ob.dep.notify()
+    return result
+  })
+})
+```
+
+* js中所有的继承方案，底层都依赖prototype实现，包括ES6 Class继承
+
+原型继承demo：
+```js
+function SuperType () {
+　　this.property = true
+}
+SuperType.prototype.getSuperValue = function () {
+　　return this.property
+}
+
+function SubType () {
+　　this.subProperty = false
+}
+// 原型继承
+SubType.prototype = new SuperType()
+var instance = new SubType()
+```
+
+## 其它知识点
+
+如何获取原型对象：Object.getPrototypeOf(obj)
+Object.prototype是所有对象的原型链终点

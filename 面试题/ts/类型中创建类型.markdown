@@ -1,0 +1,82 @@
+### 类型中创建类型
+
+* typeof + 具体值，返回值类型
+
+注意，这里这个typeof指的是ts专门操作类型的操作符，和原生js的typeof不同
+
+```js
+let s = ''
+let a: typeof s = 'a'
+```
+
+* keyof + 对象， 返回所有属性联合类型
+
+```js
+interface Person {
+  name: string;
+  age: number;
+  gender: string;
+}
+type A = keyof Person; // "name" | "age" | "gender"
+```
+
+* 索引访问类型
+
+对象索引访问类型
+```js
+type A = {
+  a: number
+  b: string
+  c: object
+}
+
+type B = A['a'] // 'number'
+type C = A['a' | 'b'] // 'number' | 'string'
+type C = A[keyof A] // 'number' | 'string' | 'object'
+```
+
+数组索引访问类型
+```js
+const M = [
+  1,
+  'a'
+]
+
+// M[number]可以遍历数组中的所有元素，返回联合类型，1 | 'a'
+type P = typeof M[number] // string | number 
+```
+
+扩展案例：
+```js
+type TupleToObject<T extends []> = {
+  [P in T[number]]: P;
+}
+```
+
+* 条件类型
+
+SomeType extends U ? X : Y
+
+```js
+// 泛型为联合类型时，条件判断，会对每一个类型做遍历判断
+type Exclude<T, U> = T extends U ? never : T;
+
+type C = 'C' | 'D'
+type D = 'D' | 'E'
+type E = Exclude<C, D> // 'C'
+```
+
+* 映射类型
+
+[key in PropKeys]
+表示key可以是PropKeys联合类型中的任意一个，类似于for in
+
+```js
+type PropsKeys = 'a' | 'b' | 'c'
+// interface Type1 {
+//     [Key in PropsKeys]:number //映射类型只能在类型别名中使用们不能在接口中使用
+// }
+type Type2 = {
+  [Key in PropsKeys]: number
+}
+```

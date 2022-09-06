@@ -1,0 +1,59 @@
+### 垂直水平居中
+
+* 绝对定位 + transform/margin
+```css
+.work {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+}
+```
+
+* 绝对定位 + margin: auto
+```css
+.work2 {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      margin:auto;
+}
+```
+
+* 父元素使用flex布局，并设置相关的属性值为center
+```css
+.par-work {
+    height: 100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+```
+
+* 使用table-cell实现
+```css
+.par-work2 {
+    height: 500px;
+    width: 500px;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+}
+.son-work2 {
+    display: inline-block;
+}
+```
+
+* 使用grid布局
+```css
+.par-work3 {
+    display: grid;
+    height: 500px;
+}
+.son-work3 {
+    align-self: center; /*设置单元格内容的垂直位置*/
+    justify-self: center; /*设置单元格内容的水平位置*/
+}
+```

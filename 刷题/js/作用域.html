@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    function fun() {
+      let str = '1'
+      function fun1() {
+        let str1 = '2'
+        console.log(str) // 1
+        console.log(str1) //2 
+      }
+      fun1()
+      console.log(str) // 1
+      // console.log(str1) // undefined
+    }
+    fun()
+    // console.log(str)
+    // console.log(str1)
+
+    function test() {
+      console.log(name) // global的name
+    }
+    function test1() {
+      const name = 'test1的name'
+      test()
+    }
+    const name = 'global的name'
+    test1()
+
+    // 作用域链的定义：变量和函数的查找链条就是作用域链。
+    // 它决定了各级上下文中的代码在访问变量和函数时的顺序：
+    // 查找变量和函数时，先在当前执行上下文找，当前没有，到下一个执行上下文找，
+    // 没有再到下一个，直到全局执行上下文，都没有就报错使用未定义的变量或函数
+  </script>
+</body>
+</html>

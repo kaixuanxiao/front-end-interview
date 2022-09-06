@@ -1,0 +1,23 @@
+### 索引签名和调用签名
+
+#### 索引签名
+
+用以定义对象额外属性的签名。
+
+```js
+// propName的取名是自定义
+type A = {
+  a: number
+  [propName: string]: any;
+}
+```
+
+#### 调用签名
+
+一个只有参数列表和返回值类型的函数定义，通过调用签名定义函数类型
+
+```js
+interface SearchFunc {
+  (source: string, subString: string): boolean;
+}
+```

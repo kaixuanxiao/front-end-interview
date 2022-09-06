@@ -1,0 +1,27 @@
+### 实现add(1)(2)(3)
+
+函数柯里化的定义：是把接受多个参数的函数变换成接受一个单一参数（最初函数的第一个参数）的函数，并且返回接受余下的参数而且返回结果的新函数的技术。
+
+柯里化可以让我们给一个函数传递较少的参数,得到一个已经记住了某些固定参数的新函数,这就是柯里化的核心。在柯里化内部就是使用闭包,对函数的参数进行缓存。柯里化让函数变得更灵活,因为我们可以通过一个函数生成一些细粒度更小的函数。这么做的目的是为了在后续函数组合的时候再使用。柯里化可以把多元函数转换成一元函数,目的是可以组合使用函数产生强大的功能
+
+```js
+// 实现一个curry函数，将普通函数进行柯里化:
+// 柯里化实现的关键：递归调用， 闭包
+function curry(fn, args = []) {
+  return function(){
+    let rest = [...args, ...arguments];
+    if (rest.length < fn.length) {
+      return curry.call(this, fn, rest);
+    }else{
+      return fn.apply(this, rest);
+    }
+  }
+}
+//test
+function sum(a,b,c) {
+    return a+b+c;
+}
+let sumFn = curry(sum);
+console.log(sumFn(1)(2)(3)); //6
+console.log(sumFn(1)(2, 3)); //6
+```

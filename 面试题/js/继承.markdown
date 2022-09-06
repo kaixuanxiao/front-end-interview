@@ -1,0 +1,102 @@
+### 继承
+
+* 通过原型继承来实现继承
+
+* 通过Class实现继承
+
+
+以Animal为被继承类为例：
+```js
+function Animal(name){
+  this.type = ['type']
+  this.sleep = () => console.log(`${a}正在睡觉`)
+}
+Animal.prototype.eat = function(){
+   console.log(`${this.name}正在吃东西`)
+}
+Animal.prototype.a = [1]
+// 知识点：函数内方法和原型对象方法区别：
+// 函数内方法：可以直接访问到函数内部的私有变量，实例可重写自己的函数内方法
+// 原型对象方法：所有实例共用的方法（或属性，当属于为对象类型时，修改对象值会导致所有其它实例值一起发生变化）
+```
+
+* 原型继承
+
+#### 核心：将父类实例作为子类的原型
+
+```js
+function Cat(name){
+  this.name = name
+}
+Cat.prototype = new Animal()
+
+let cat = new Cat('cat')
+```
+#### 缺点
+（1）来自父类的所有属性被所有实例共享
+（2）创建子类实例时，无法向父类构造函数传参
+
+* 寄生组合继承
+
+#### 核心：子类构造函数调用父类方法，子类原型继承父类原型
+
+```js
+function Cat(name){
+  // 直接复制了一份父类属性和方法，解决父类属性被共用问题
+  this.name = name
+  Animal.call(this); 
+}
+Cat.prototype = Animal.prototype
+Cat.prototype.constructor = Cat
+
+let cat = new Cat('cat')
+```
+
+* ES6 Class Extends
+
+ES6的class可以看作是一个语法糖，只是新的class定义类的写法让对象原型的写法更加简单明了、更接近与面向对象的编程思想。与上面ES5写的类使用ES6实现，例如：
+
+* 只需用class定义
+
+* ES6的constructor方法，代表这该类的构造方法
+
+* 类的继承 extends，子类会继承父类所有的方法和属性
+
+* 子类可以用super调用父类的方法或属性进行加工，再加上子类自己的方法和属性
+
+```js
+class Animal{
+  constructor(name = 'Animal'){
+    this.name = name
+  }
+  
+  sleep(){ console.log(`父类方法：${this.name}正在睡觉`) }
+}
+
+
+class Cat extends Animal,Animal1{
+  constructor(name) {
+    super(name)
+    this._my = ''
+    this.sleep = () => {console.log(`子类方法1：正在睡觉`)}
+  }
+
+  sleep(){
+    console.log(`子类方法2：正在睡觉`)
+  }
+}
+
+let cat = new Cat('cat')
+```
+
+* 总结
+
+  * 都是基于protytype实现继承，class可以看作是一个语法糖，只是新的class定义类的写法让对象原型的写法更加简单明了、更接近与面向对象的编程思想
+
+  * 细节区别：
+
+    * class定义的属性都是实例属性，不是私有属性
+      如何实现私有属性/方法：命名约束，使用Symbol，私有属性#通过babel编译，TS
+    * class定义的方法都是挂载在原型上的方法，不是实例自有方法
+    * class继承必须调用super，之后改写父类属性
+

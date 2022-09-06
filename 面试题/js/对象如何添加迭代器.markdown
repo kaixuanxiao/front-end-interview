@@ -1,0 +1,11 @@
+### 对象如何添加迭代器
+
+
+通过Symbol.iterator属性，可以让对象支持迭代器接口。
+
+```js
+obj[Symbol.iterator] = function* () {
+  yield* Object.values(this); // yield* 表达式迭代操作数，并产生它返回的每个值
+};
+console.log([...obj]);
+```

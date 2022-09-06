@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+<script>
+    // typeof 在对值类型number、string、boolean 、null 、 undefined、 以及引用类型的function的反应是精准的；
+// 但是，对于对象{ } 、数组[ ] 、null 都会返回 object
+
+console.log(typeof function(){}) // function
+console.log(typeof []) // object
+
+// instanceof作用：
+
+// ①用于判断某个实例是否属于某构造函数
+// ②在继承关系中用来判断一个实例是否属于它的父类型或者祖先类型的实例
+
+// 定义构造函数
+function C() {}
+let o = new C()
+function D() {}
+console.log(o instanceof C,o._proto_ === C.prototype)
+console.log(o instanceof Object,o.__proto__.__proto__ === Object.prototype)
+</script>
+</body>
+</html>

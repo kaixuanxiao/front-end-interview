@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+<script>
+// 原生xhr封装
+function request(method, url) {
+  return new Promise((resolve, reject) => {
+    let request = new XMLHttpRequest()
+    request.open(method,path)
+    request.send()
+    request.onreadystatechange=()=>{
+        if(request.readyState ==4){
+            if(request.status ==200){
+              resolve.call(null,request.responseText)
+            }else{
+              reject.call(undefined,request.status)
+            }
+        }
+    }
+  })
+}
+// request('get','1.php').then(function(da){
+//   console.log(da)
+// }).then(function(da){
+//   request('get','2.php').then(function(da){
+//       console.log(da)
+//   })
+// })
+
+// promise用法
+// 1.实例方法
+// 1 .then() 得到异步任务正确的结果
+// 2 .catch() 获取异常信息
+// 3 .finally() 方法用于指定不管Promise对象最后状态如何,都会执行的操作
+// 成功与否都会执行（不是正式标准）
+function foo(val) {
+  return new Promise((resolve, reject) => {
+    setTimeout(()=> {
+      resolve(val)
+      // reject('reject')
+    },parseInt(val)*1000)
+  })
+}
+foo().then(
+  (data) => {console.log(data)},
+  (data)=>{console.log(data)}
+  ).finally(() => {console.log('finally')})
+
+// 2.静态方法
+
+// 1 .all()
+// Promise.all方法接受一个数组作参数，数组中的对象（p1、p2、p3）均为promise实例（如果不是一个promise，该项会被用Promise.resolve转换为一个promise)。它的状态由这三个promise实例决定
+// 2 .race()
+// Promise.race方法同样接受一个数组作参数。当p1, p2, p3中有一个实例的状态发生改变（变为fulfilled或rejected），p的状态就跟着改变。并把第一个改变状态的promise的返回值，传给p的回调函数
+
+let p1 = foo('1')
+let p2 = foo('2')
+let p3 = foo('3')
+// Promise.all([p1,p2,p3]).then((res) => {
+//   console.log(res)
+// })
+Promise.race([p1,p2,p3]).then((res) => {
+  console.log(res)
+})
+
+// Promise异常捕获
+// 1.reject 捕获异常
+function p4(val) {
+  return new Promise((resolve,reject) => {
+    setTimeout(()=>{
+      if (val) {
+        resolve('success')
+      } else {
+        reject('error')
+      }
+    },1000)
+  })
+}
+// p4('123').then(()=>{},(error)=>{console.log(error)})
+
+// 2.catch
+// p4('').then().catch((error)=>{console.log(error)})
+// 3.finally
+p4('').then().catch((error)=>{console.log(error)}).finally(()=>{console.log('finally')})
+
+
+// async await异常捕获
+const fetchData = () => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            reject('async error')
+        }, 1000)
+    })
+}
+
+(async () => {
+    try {
+        const data = await fetchData()
+        console.log('data is ->', data)
+    } catch(err) {
+        console.log('err is ->', err)
+    }
+})()
+
+Promise.all(
+  [
+    Promise.reject({ code: 500, msg: "服务异常" }),
+    Promise.resolve({ code: 200, list: [] }),
+    Promise.resolve({ code: 200, list: [] })
+  ].map(p => p.catch(e => e))
+)
+  .then(res => {
+    console.log("res=>", res);
+  })
+  .catch(error => {
+    console.log("error=>", error);
+  });
+
+</script>
+</body>
+</html>

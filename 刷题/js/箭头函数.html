@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      //1、普通函数的setTimeout 一秒后执行是在全局作用域，所有this指向window对象，this.id指向了全局变量id，输出Golbal。
+      //箭头函数的this在定义的时候就确定了，继承fn3的执行环境中的this，fn3的this指向被call方法改变绑定到obj这个对象
+      var id = "Global";
+      //普通函数
+      function fn2() {
+        setTimeout(function () {
+          console.log(this.id);
+        }, 1000);
+      }
+      //箭头函数
+      function fn3() {
+        setTimeout(() => {
+          console.log(this.id);
+        }, 1000);
+      }
+
+      fn2.call({
+        id: "obj",
+      }); //Global
+
+      fn3.call({
+        id: "obj",
+      }); //obj
+
+      // 2、普通函数作为对象的方法调用，this指向所属的对象（谁调用它就指向谁），this.id 就是obj.id；
+      // 箭头函数继承定义它的执行环境的this，指向window对象，指向全局变量，输出Global。花括号{}无法形成一个单独的执行环境，所有它依然在全局中。
+      var id1 = "id1";
+      var obj1 = {
+        id1: "id2",
+        a: function () {
+          console.log(this.id1);
+        },
+        b: () => {
+          console.log(this.id1);
+        },
+      };
+      obj1.a(); // id2
+      obj1.b(); // id1
+
+      // 3、.call()/.apply()/.bind()方法可以用来动态修改函数执行时this的指向，但由于箭头函数的this定义时就已经确定且永远不会改变
+      var name = "jack";
+      var person = {
+        name: "lac",
+        say1: function () {
+          console.log("say1" + this.name); // call1
+        },
+        say2: () => {
+          console.log("say2" + this.name); // jack
+        },
+      };
+      person.say1.call({ name: "call1" });
+      person.say2.call({ name: "call2" });
+
+      // 4、箭头函数中的this引用的是最近作用域中的this，是向外层作用域中，一层层查找this，直到有this的定义。
+      // 5、箭头函数不能作为构造函数使用new
+      // 构造函数做了什么？
+      // ①JS内部首先会先生成一个对象
+      // ②对象原型指向构造函数的prototype，再把函数中的this指向该对象
+      // ③然后执行构造函数中的语句
+      // ④最终返回该对象实例
+      // 箭头函数没有自己的this，this继承外层执行环境中的this，且this永远不会改变。new会报错
+      let fn5 = (name, age) => {
+        this.name = name;
+        this.age = age;
+      };
+      // let person5 = new fn5("gaby", 20); //Uncaught TypeError: fn5 is not a constructor
+
+      // 箭头函数没有arguments,箭头函数处于全局作用域中 箭头函数的this指向全局对象，会报arguments未声明的错。
+      let fn6 = (name) => {
+        console.log(arguments); // Uncaught ReferenceError: arguments is not defined
+      };
+      let fn7 = function (name) {
+        console.log(arguments);
+      };
+      fn6() // arguments is not defined
+      fn7();
+
+      // （1）箭头函数语法更简洁清晰，快捷。
+
+      // （2）箭头函数没有原型prototype，并不会自己创建this，并且this不能被修改，call等都不能修改到。只能间接修改被继承的this
+
+      // （3）箭头函数的this在定义时就定了，继承外一层的普通函数
+
+      // （4）如果箭头函数外一层再外一层都不能找到普通函数，在严格和非严格情况下都会指向window对象
+
+      // （5）箭头函数的this指向全局，使用arguments会报未声明的错误
+
+      // （6）箭头函数的this指向外一层的普通函数，使用argument继承该普通函数
+
+      // （7）箭头函数不能构造函数，不能new.target，不能new，没有constructor
+
+      // （8）箭头函数不支持重复命名参数，普通函数可以重复命名参数
+    </script>
+  </body>
+</html>

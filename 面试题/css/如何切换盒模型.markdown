@@ -1,0 +1,6 @@
+### 垂直水平居中
+
+* Content-box 标准盒模型 width 不包括 padding 和 border
+* Border-box 怪异盒模型 width 包括 padding 和 border
+
+通过box-sizing切换盒模型标准   

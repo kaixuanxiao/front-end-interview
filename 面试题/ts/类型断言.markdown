@@ -1,0 +1,31 @@
+### 类型断言
+
+通过 as 关键字，类型断言可以直接对数据进行类型转换
+
+* 常见as写法
+
+```js
+let someValue: any = "this is a string";
+
+let strLength: number = (someValue as string).length;
+```
+
+* as const
+
+告诉编译器为表达式推断出它能推断出的最窄或最特定的类型。如果不使用它，编译器将使用其默认类型推断行为，这可能会导致更广泛或更一般的类型。
+
+```js
+// 如果不使用as const，则会报错，因为默认推断a的类型为number[]，使用as const后，编译器会推断a的类型为[1]. sign方法只能接收一个参数
+let a = [1] as const
+let b = Math.sign(...a)
+```
+
+* 非空断言 ! 
+
+非空断言操作符: 排除 null 和 undefined
+
+
+
+
+
+

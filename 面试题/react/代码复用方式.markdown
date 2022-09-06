@@ -1,0 +1,155 @@
+### 代码复用方式
+
+#### 高阶组件HOC
+高阶组件（HOC）是 React 中用于复用组件逻辑的一种高级技巧。HOC 自身不是 React API 的一部分，它是一种基于 React 的组合特性而形成的设计模式。
+高阶组件其实就是参数为组件，返回值为新组件的函数。
+高阶组件可以用到很多的场景中去，打印日志、提取公共函数、调用公共api、渲染公共UI等等。
+
+```js
+import React from 'react'
+import mousePositionHoc from '../hoc/MousePosition'
+class MousePoint extends React.Component{
+  constructor(props){
+    super(props)
+  }
+  render(){
+    return(
+      <div>
+        <span>鼠标的横坐标{this.props.positionX}</span>
+        <span>鼠标的纵坐标{this.props.positionY}</span>
+      </div>
+    )
+  }
+}
+export default mousePositionHoc(MousePoint)
+
+// mousePositionHoc.js
+import React from 'react'
+export default (Component) => {
+ return class WrappedComponent extends React.Component {
+    constructor(props){
+      super(props)
+      this.state = {
+        positionX: 0,
+        positionY: 0
+      }
+    }
+    componentDidMount() {
+      document.addEventListener('mousemove', (e) => {
+        this.setState({
+          positionX: e.clientX,
+          positionY: e.clientY
+        })
+      }) // 在这里我们更新鼠标的位置，并存储在state中去，然后通过props传递给被传入的组件
+    }
+    render(){
+      return(
+        <Component {...this.props} {...this.state}/>
+        //props:这里返回的是WrappedComponent这个组件，所以本应该传递给Component组件的props，我们应该通过WrappedComponent传递下去
+        //state: WrappedComponent可以操作自己的状态，我们可以将这些状态通过props的方式传递给Component组件
+      )
+    }
+    
+  }
+}
+```
+
+#### Render Props
+Render Props是指一种在 React 组件之间使用一个值为函数的 prop 共享代码的简单技术
+
+```js
+import React from 'react'
+import MousePoint from './MousePoint'
+export default class MouseTracker extends React.Component{
+  constructor(props){
+    super(props)
+  }
+  render(){
+    return(
+      <div>
+        <MousePoint
+          render={(state) => {
+            return(
+              <div>
+                <span>鼠标横坐标是{state.positionX}</span>
+                <span>鼠标纵坐标是{state.positionY}</span>
+              </div>
+            )
+          }}
+        />
+      </div>
+    )
+  }
+}
+
+// MousePoint.js
+import React from 'react'
+export default class MousePoint extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      positionX: 0,
+      positionY: 0
+    };
+  }
+  componentDidMount() {
+    document.addEventListener('mousemove', (e) => {
+      this.setState({
+        positionX: e.clientX,
+        positionY: e.clientY
+      })
+    })
+  }
+  
+  render() {
+    return ( 
+      <div>
+         {
+          this.props.render(this.state)
+         } 
+      </div>
+    );
+  }
+}
+```
+
+#### HOOK
+
+Hook 是 React 16.8 的新增特性。它可以让你在不编写 class 的情况下使用 state 以及其他的 React 特性。
+
+我们知道以往的函数组件只能当做展示组件，因为不能够使用React的生命周期和state，所以只能接受props，来渲染页面，react 16.8中引入了Hook这个概念，使函数式组件也具备class组件同样的特性。
+
+```js
+import React, { useState, useEffect } from 'react'
+export default () => {
+  const [positionX, setPositionX] = useState(0)
+  const [positionY, setPositionY] = useState(0)
+  const getMousePosition = (e) => {
+    setPositionX(e.clientX)
+    setPositionY(e.clientY)
+  }
+  useEffect(() => {
+    document.addEventListener('mousemove', getMousePosition)
+    return () => {
+      document.removeEventListener('mousemove', getMousePosition)
+    };
+  });
+  return {
+    positionX: positionX,
+    positionY: positionY
+  }
+}
+
+// MousePoint.js
+import useMousePosition from '../hooks/useMouse'
+
+
+export default () => {
+  const mousePosition = useMousePosition()
+  return(
+    <div>
+      <span>鼠标的横坐标{mousePosition.positionX}</span>
+      <span>鼠标的纵坐标{mousePosition.positionY}</span>
+    </div>
+  )
+```

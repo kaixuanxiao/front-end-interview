@@ -1,0 +1,32 @@
+### 泛型
+
+泛型的本质是参数化类型
+
+使用泛型来创建可重用的组件，一个组件可以支持多种类型的数据，而不需要编写多个类型的代码，扩展灵活
+
+* 泛型函数
+
+```js
+function identity<T>(arg: T): T {
+    return arg;
+}
+```
+
+* 泛型类型
+
+```js
+type Readonly<T> = {
+    readonly [P in keyof T]: T[P]
+}
+```
+
+* 泛型类
+
+```js
+class GenericNumber<T> {
+    zeroValue: T;
+    add: (x: T, y: T) => T;
+}
+
+let myGenericNumber = new GenericNumber<number>();
+```

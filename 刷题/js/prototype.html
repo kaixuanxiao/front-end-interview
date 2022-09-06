@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    // JavaScript 中没有类的概念的，主要通过原型链来实现继承
+    function Animal(name) {
+      this.name = name
+    }
+    let cat = new Animal()
+    console.log(cat.__proto__===Animal.prototype)
+    console.log(Animal===Animal.prototype.constructor)
+    console.log(Animal.prototype.__proto__===Object.prototype)
+    console.log(null===Object.prototype.__proto__)
+    console.log(Object===Object.prototype.constructor)
+    // 构造函数也就只是一个普通的函数而已，如果这个函数可以使用 new 关键字来创建它的实例对象，那么我们就把这种函数称为 构造函数。
+
+    // 原型链的作用：原型链如此的重要的原因就在于它决定了 JavaScript 中继承的实现方式。当我们访问一个属性时，查找机制如下：
+
+    // 访问对象实例属性，有则返回，没有就通过 proto 去它的原型对象查找。
+    // 原型对象找到即返回，找不到，继续通过原型对象的 proto 查找。
+    // 一层一层一直找到 Object.prototype ，如果找到目标属性即返回，找不到就返回 undefined，不会再往下找，因为在往下找 proto 就是 null 了
+
+  </script>
+</body>
+</html>

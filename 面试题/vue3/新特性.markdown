@@ -1,0 +1,69 @@
+### 新特性
+
+#### 响应式系统
+
+* Vue 2 的响应式机制是基于 Object.defineProperty()
+* Vue 3 的响应式机制是基于 Proxy()，但创建ref的基础类型时仍然使用对象访问器实现
+* defineProperty问题，只是属性值读取监听：
+  * 无法探测对象新增/删除 property，需要手动通过set/delete方法设置
+  * 对数组类型监听缺陷：无法监控到数组下标的变化，导致通过数组下标添加元素，无法实时响应
+* Proxy 实现了数据真正的代理，可以监听更多的数据格式，比如 Set、Map
+
+### Compositional API
+
+* Vue 2采用Options API的问题
+  * 新增功能基本都得修改 data、method 等配置，并且代码上 300 行之后，会经常上下反复横跳，开发很痛苦。
+  * 代码不好复用，Vue 2 的组件很难抽离通用逻辑，只能使用 mixin，还会带来命名冲突的问题。
+
+* Vue 3采用Compositional API好处
+  * 不再上下反复横跳，我们可以把一个功能模块的 methods、data 都放在一起书写，维护更轻松。
+  * 代码方便复用，可以把一个功能所有的 methods、data 封装在一个独立的函数里，复用代码非常容易。  
+  * 用到的功能都 import 进来，对 Tree-shaking 很友好
+
+* 对比Mixin: 更清晰的数据/方法来源，可避免命名冲突，不同组合式函数之间有更清晰的关系
+
+### 新的组件
+
+* Fragment: Vue 3 组件不再要求有一个唯一的根节点，清除了很多无用的占位 div。
+* Teleport: 允许组件渲染在别的元素内，主要开发弹窗组件的时候特别有用：将一个组件的一部分模板“传送”到该组件的 DOM 层次结构之外的 DOM 节点中
+* Suspense: 异步组件，更方便开发有异步请求的组件：用来在组件树中编排异步依赖
+
+### 其它
+
+新增
+
+* 新增侦听器watchEffect
+  * 不需要手动传入依赖，初始化watchEffect时会执行一次来自动获取依赖（watch 只追踪明确侦听的源）
+  * 回调会立即执行
+
+修改
+
+
+* 插槽新写法
+
+  v-slot:name="***"
+
+* v-model合并sync
+
+  可以指定多个v-model
+  v-model:***="value"
+  this.$emit('update:***',value)
+  ***默认为modelValue
+
+废弃
+
+* watch不支持键路径
+
+* 废除过滤器：用方法调用或计算属性替换过滤器
+
+* 移除了 $listeners，封装进了 $attrs中
+
+* 移除了 $children，使用$refs代替
+
+### 框架实现层面更新
+
+* 内部更加彻底的模块解耦，比如reactive模块可以单独抽离给其它框架使用
+* 无感知性能优化
+  * vue3.0 中虚拟DOM新增了静态标记（patchFlag），将纯静态元素与动态元素分开。diff时只比对动态元素；静态提升：静态元素都被拿到了渲染函数体外面，避免重复创建
+  * cacheHandlers 事件侦听器缓存：V2.0每次触发dom更新都要重新生成全新的function，在Vue3.0中，提供了事件缓存对象cacheHandlers，当cacheHandlers开启的时候，编译会自动生成一个内联函数，将其变成一个静态节点，当事件再次触发时，就无需重新创建函数直接调用缓存的事件回调方法
+  * 引入了Tree-Shaking，Tree-Shaking带来的bundle体积更小是显而易见的。在2.x版本中，很多函数都挂载在全局Vue对象上，比如nextTick、set等函数，因此虽然我们可能用不到，但打包时只要引入了vue这些全局函数仍然会打包进bundle中。

@@ -1,0 +1,161 @@
+### 浅克隆和深克隆
+
+浅复制(浅克隆)：直接将存储在栈中的值赋值给对应变量，如果是基本数据类型，则直接赋值对应的值，如果是引用类型，则赋值的是地址
+
+深复制(深克隆)：就是把数据赋值给对应的变量，从而产生一个与源数据不相干的新数据(数据地址已变化)，是拷贝对象各个层级的属性。
+
+#### 常见的浅克隆操作：
+
+* 数组的concat,slice等方法
+```js
+const a = [[1]];
+const b = a.slice();
+b[0][0] = 2
+a[0][0] // 2
+```
+
+* 展开运算符...
+```js
+const a = [[1], [2], [3]];
+const b = [...a];
+b.shift().shift(); 
+a // [[], [2], [3]]
+b // [[2], [3]]
+```
+
+* Object.assign
+```js
+// 拷贝源对象自身的并且可枚举的属性
+const obj = {};
+Object.defineProperty(obj, 'x', { enumerable: false, value: 15 });
+obj.test = {
+  name: '啊'
+}
+const cloneObj = {};
+Object.assign(cloneObj, obj);
+cloneObj.test.name = '啊啊'
+console.log('obj', obj) // {test: {name: '啊啊'}, x: 15}
+console.log('cloneObj', cloneObj) // {test: {name: '啊啊'}}
+```
+
+#### 常见的深克隆操作：
+
+* JSON.parse和JSON.stringify
+
+优点：简单方便
+缺点：
+值为Function，Symbol，Undefined，key为Symbol，序列化后会丢失；
+对象存在循环引用会报错
+Date对象, 序列化后会变为字符串；
+RegExp、Error对象，序列化后得到空对象；
+NaN、Infinity，-Infinity，序列化的结果会变成null
+序列化只会处理对象的可枚举的自有属性
+
+```js
+const obj = {a: function(){}}
+JSON.stringify(obj) // {}
+```
+
+
+* 递归循环
+
+总结要点:
+
+要考虑各种数据类型，普通类型和对象类型，对象又分为普通对象，方法，和其它使用new keyword实现的对象
+考虑属性的描述对象和原型链
+方法复制比较特殊，
+要考虑循环引用
+考虑递归爆栈
+
+#### 有缺陷版本
+```js
+//完整性：其它对象类型都没有考虑，如Date, RegExp等
+//如果一个对象的隐式原型为undefined，比如上方通过Object.create可以创建的隐式原型为空的对象，不存在hasOwnProperty这个方法，会直接报错。
+//没有考虑递归爆栈
+//没有考虑循环引用
+function deepClone(obj) {
+  let newObj = Array.isArray(obj) ? [] : {}
+  if (obj && typeof obj === "object") {
+      for (let key in obj) {
+          if (obj.hasOwnProperty(key)) {
+              newObj[key] = (obj && typeof obj[key] === 'object') ? deepClone(obj[key]) : obj[key];
+          }
+      }
+  } 
+  return newObj
+}
+```
+
+#### 完整版本
+```js
+//核心思想：深度遍历递归，根据不同数据类型差异化处理
+//* 基础数据类型不需要深度遍历，直接返回
+//* 对特殊对象'date','regexp','set','map','weakset','weakmap'做针对性拷贝（通过原型构造新的实例）
+//* 对function做针对性拷贝
+//* 对symbol做针对性拷贝
+//* 对Blob做针对性拷贝
+//* 对array深度递归拷贝
+//* 对常规object深度递归拷贝
+//其它：利用WeakMap处理循环引用
+
+function getDataType (obj) {
+    return Object.prototype.toString.call(obj).slice(8,-1).toLowerCase();
+}
+function cloneFun (fun) {
+    let _fun = new Function(`return ${fun}`)()
+    for(let i in fn){
+      _fun[i] = fn[i]
+    }
+    return _fun
+}
+function cloneBlob (blob) {
+  // 这里暂不处理
+  return blob
+}
+
+function deepClone(origin, hash = new WeakMap()) {
+  const type = getDataType(origin)
+  if(['number','string','null','undefined','boolean'].includes(type)){
+    return origin
+  }
+
+  if(['date','regexp','set','map','weakset','weakmap'].includes(type)){
+    return new origin.constructor(origin)
+  }
+  
+  if(type === 'function'){
+    return cloneFun(origin)
+  }
+
+  if(type === 'blob'){
+    return cloneBlob(origin)
+  }
+
+  if(type === 'symbol'){
+    return Symbol(origin.toString().match(/\((.?)\)/)[1])
+  }
+
+  if(hash.has(origin)) {
+    // 如果拷贝对象已存在，直接返回对象指针
+    return hash.get(origin)
+  }
+
+  let newObj = new origin.constructor()
+  hash.set(origin, newObj)
+
+  if(type === 'array'){
+    for (let key in origin) {
+      newObj[key] = deepClone(origin[key], hash)
+    }
+  }
+
+  if(type === 'object'){
+    // 这里使用Reflect.ownKeys可以获取到包括symbol在内的所有自有属性
+    for (let key of Reflect.ownKeys(origin)) {
+      newObj[key] = deepClone(origin[key], hash)
+    }
+  }
+  
+  return newObj
+}
+```

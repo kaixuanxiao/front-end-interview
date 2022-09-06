@@ -1,0 +1,72 @@
+### 闭包
+
+* 什么是闭包
+
+* 闭包的原理
+
+* 闭包的应用场景
+
+* 闭包的问题
+
+#### 什么是闭包
+
+一种特殊的代码结构：能够读取父函数内部变量的子函数被外部引用，导致子函数所引用的内部变量一直保存在内存中，称为闭包。
+
+```js
+function f1(){
+　var n = 1;
+  // var bibao = new Array(1000000).join('x')
+　function f2(){
+　 console.log(n++)
+　}
+　return f2;
+}
+var result = f1();
+result(); // 1
+result(); // 2
+```
+
+#### 闭包的原理
+
+为什么函数内部变量能保存：函数内部变量在函数执行完成之后会被销毁，但是如果内部变量被外部引用，导致无法被垃圾回收清除，一直维持在内存中。
+
+### 闭包的应用场景
+
+* 在函数外部能够访问到函数内部的变量
+
+```js
+// demo
+const module = (function (){
+  var a = 1
+  return {
+    getA() {
+      return a
+    }
+  }
+})()
+module.getA() // 1
+```
+
+* 使已经运行结束的函数上下文中的变量对象继续留在内存中：防抖，截流，函数柯里化
+
+```js
+// 防抖
+function debounce(fn, time) {
+  let timer = null
+  return function() {
+    if(timer) {
+      clearTimeout(timer)
+    }
+    timer = setTimeout(() => {
+      fn.apply(this, arguments)
+    }, time)
+  }
+}
+
+const debounceFn = debounce(fn, 1000)
+debounceFn()
+debounceFn()
+```
+
+#### 闭包的问题
+闭包会导致原始作用域链不释放,造成内存泄漏(占用)

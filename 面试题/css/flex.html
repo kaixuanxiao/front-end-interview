@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .flex{
+      display: flex;
+      background: orange;
+      height: 500px;
+      flex-wrap: wrap;
+      
+      /* 控制主轴内元素排列方式 */
+      justify-content: center;
+      /* 控制轴线布局方式 */
+      align-content: center;
+      /* 控制交叉轴线布局方式 */
+      align-items: center;
+    }
+    .flex div{
+      background: green;
+      width: 460px;
+      height: 60px;
+      padding: 20px;
+      flex:0, 0;
+    }
+    .flex div:nth-child(1){
+      /* align-self: center; */
+    }
+    .flex div:nth-child(2){
+      background: blue;
+      height: 100px;
+    }
+    .flex div:nth-child(3){
+      background: yellow;
+    }
+  </style>
+</head>
+<body>
+  <div class="flex">
+    <div>1</div>
+    <div>2</div>
+    <div>3</div>
+  </div>
+  <div style="margin-top:20px;width:200px;background:green">200px</div>
+</body>
+</html>
